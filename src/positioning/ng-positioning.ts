@@ -2,18 +2,23 @@
  * @copyright Valor Software
  * @copyright Federico Zivolo and contributors
  */
+import { Renderer2 } from '@angular/core';
 import {
   computeAutoPlacement,
   getClientRect,
   getTargetOffsets,
-  getReferenceOffsets, setStyles
+  getReferenceOffsets,
+  roundOffset,
+  isNumeric
 } from './utils';
 
 import { updateArrowPosition, flip, preventOverflow, shift } from './modifiers';
-import { roundOffset } from './utils/roundOffset';
 import { Offsets } from './models';
 
+
 export class Positioning {
+  private renderer: Renderer2 = null;
+
   position(hostElement: HTMLElement, targetElement: HTMLElement, round = true): Offsets {
     return this.offset(hostElement, targetElement, false);
   }
@@ -23,13 +28,13 @@ export class Positioning {
   }
 
   positionElements(
-    hostElement: HTMLElement,   // button or reference
-    targetElement: HTMLElement, // tooltip or popper
+    hostElement: HTMLElement,
+    targetElement: HTMLElement,
     position: string,
     appendToBody?: boolean
   ): Offsets {
     const hostElPosition = this.offset(hostElement, targetElement, false);
-    const placement = computeAutoPlacement(position, hostElPosition, targetElement, hostElement, 'viewport', 0);
+    const placement = computeAutoPlacement(position, hostElPosition, targetElement, hostElement);
     const targetElPosition: Offsets = getTargetOffsets(targetElement, hostElPosition, placement);
 
     updateArrowPosition(targetElement, targetElPosition, hostElPosition, '.arrow', placement);
@@ -46,6 +51,25 @@ export class Positioning {
       return modifier(targetPosition);
     }, targetElPosition);
   }
+
+  initRenderer(renderer: Renderer2) {
+    if (!this.renderer) {
+      this.renderer = renderer;
+    }
+  }
+
+  setStyles(element: HTMLElement, styles: any) {
+    Object.keys(styles).forEach((prop: any) => {
+      let unit = '';
+      // add unit if the value is numeric and is one of the following
+      if (['width', 'height', 'top', 'right', 'bottom', 'left'].indexOf(prop) !== -1 &&
+        isNumeric(styles[prop])) {
+        unit = 'px';
+      }
+
+      this.renderer.setStyle(element, prop, `${String(styles[prop])}${unit}`);
+    });
+  }
 }
 
 const positionService = new Positioning();
@@ -54,9 +78,11 @@ export function positionElements(
   hostElement: HTMLElement,
   targetElement: HTMLElement,
   placement: string,
+  renderer: Renderer2,
   appendToBody?: boolean
 ): void {
 
+  positionService.initRenderer(renderer);
   const pos = positionService.positionElements(
     hostElement,
     targetElement,
@@ -64,7 +90,7 @@ export function positionElements(
     appendToBody
   );
 
-  setStyles(targetElement, {
+  positionService.setStyles(targetElement, {
     'will-change': 'transform',
     top: '0px',
     left: '0px',

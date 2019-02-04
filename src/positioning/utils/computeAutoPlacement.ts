@@ -14,7 +14,7 @@ export function computeAutoPlacement(
   refRect: Offsets,
   target: HTMLElement,
   host: HTMLElement,
-  boundariesElement: string,
+  boundariesElement = 'viewport',
   padding = 0
 ) {
   if (placement.indexOf('auto') === -1) {

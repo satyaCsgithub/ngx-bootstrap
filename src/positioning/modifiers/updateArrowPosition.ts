@@ -15,7 +15,7 @@ export function updateArrowPosition(
 
   // if arrowElement is not found, don't run the modifier
   if (!arrowElement) {
-    return;
+    return offsetsTarget;
   }
 
   const isVertical = ['left', 'right'].indexOf(placement) !== -1;
@@ -58,9 +58,6 @@ export function updateArrowPosition(
     [side]: Math.round(sideValue),
     [altSide]: '' // make sure to unset any eventual altSide value from the DOM node
   };
-
-  offsetsArrow.arrowElement = arrowElement;
-
 
   setStyles(arrowElement, offsetsArrow);
 }

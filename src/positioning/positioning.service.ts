@@ -1,7 +1,9 @@
-import { Injectable, ElementRef } from '@angular/core';
+import { Injectable, ElementRef, Renderer2, RendererFactory2 } from '@angular/core';
 
-import { positionElements } from './ng-positioning';
 import { fromEvent, merge, of, animationFrameScheduler, Subject } from 'rxjs';
+
+import { isNumeric } from './utils';
+import { positionElements } from './ng-positioning';
 
 
 export interface PositioningOptions {
@@ -40,6 +42,7 @@ export interface PositioningOptions {
 
 @Injectable()
 export class PositioningService {
+  private renderer: Renderer2;
   private update$$ = new Subject<null>();
 
   private events$: any = merge(
@@ -51,7 +54,7 @@ export class PositioningService {
 
   private positionElements = new Map();
 
-  constructor() {
+  constructor(rendererFactory: RendererFactory2) {
     this.events$
       .subscribe(() => {
         this.positionElements
@@ -60,6 +63,7 @@ export class PositioningService {
               _getHtmlElement(positionElement.target),
               _getHtmlElement(positionElement.element),
               positionElement.attachment,
+              rendererFactory.createRenderer(null, null),
               positionElement.appendToBody
             );
           });

@@ -7,4 +7,8 @@ export interface Offsets {
   width: number;
   marginTop?: number;
   marginLeft?: number;
+  arrow?: {
+    arrowElement?: HTMLElement;
+    offsetsArrow?: { [key: string]: string|number|HTMLElement };
+  };
 }

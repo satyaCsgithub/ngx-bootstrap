@@ -17,4 +17,4 @@ export { getTargetOffsets } from './getTargetOffsets';
 export { getWindowSizes } from './getWindowSizes';
 export { isFixed } from './isFixed';
 export { isNumeric } from './isNumeric';
-export { setStyles } from './setStyles';
+export { roundOffset } from './roundOffset';
